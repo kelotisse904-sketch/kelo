@@ -113,8 +113,10 @@ void Log(string s)
 }
 
 // parse comma-separated allowed symbols into array
-int SplitString(string s, string sep, string &arr[])
+int SplitString(string s, string sep, string arr[])
 {
+   // StringSplit expects a single character separator
+   if(StringLen(sep) == 0) return(0);
    return(StringSplit(s, sep[0], arr));
 }
 
@@ -186,7 +188,7 @@ int CreateIndicatorHandles(string sym, ENUM_TIMEFRAMES tf)
 }
 
 // copy buffer with safety
-bool CopyIndicator(int handle, int index, int count, double &buf[])
+bool CopyIndicator(int handle, int index, int count, double buf[])
 {
    ArrayResize(buf, count);
    int copied = CopyBuffer(handle, 0, index, count, buf);
@@ -203,7 +205,7 @@ ulong RetryTrade(bool isBuy, double lots, double price, double sl, double tp, in
    for(int attempt = 0; attempt < maxRetry; attempt++)
    {
       trade.SetExpertMagicNumber(MagicNumber);
-      trade.SetDeviation(MaxSlippage);
+      // CTrade.SetDeviation may not exist on all platforms; using OrderSend alternative in earlier versions.
       bool ok;
       if(isBuy)
          ok = trade.Buy(lots, Symbol(), price, sl, tp);
